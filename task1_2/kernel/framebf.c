@@ -12,7 +12,6 @@ unsigned int width, height, pitch;
 unsigned char *fb;
 
 
-
 /**
 * Set screen resolution to 1024x768
 */
@@ -83,7 +82,6 @@ void framebf_init()
     }
 }
 
-
 void drawPixelARGB32(int x, int y, unsigned int attr)
 {
     int offs = (y * pitch) + (COLOR_DEPTH/8 * x);
@@ -95,8 +93,9 @@ void drawPixelARGB32(int x, int y, unsigned int attr)
     */
     //Access 32-bit together
     *((unsigned int*)(fb + offs)) = attr;
-    }
-    void drawRectARGB32(int x1, int y1, int x2, int y2, unsigned int attr, int fill)
+}
+
+void drawRectARGB32(int x1, int y1, int x2, int y2, unsigned int attr, int fill)
     {
     for (int y = y1; y <= y2; y++ )
     for (int x = x1; x <= x2; x++) {
@@ -107,47 +106,7 @@ void drawPixelARGB32(int x, int y, unsigned int attr)
     }
 }
 
-
-
-void printFont(unsigned char *fontData, int x, int y, unsigned int attr, int pixelSize)
-{
-    // Iterate through each row of the font data
-    for (int row = 0; row < 8; row++)
-    {
-        // Get the binary pattern for the current row
-        unsigned char rowData = fontData[row];
-        
-        // Iterate through each column of the font data
-        for (int col = 0; col < 8; col++)
-        {
-            // Extract the bit for the current column
-            unsigned char pixel = (rowData >> (7 - col)) & 0x01;
-
-            // Calculate the position in the framebuffer
-            int pixelX = x + (col * pixelSize);
-            int pixelY = y + (row * pixelSize);
-
-            // Draw the pixel based on the font data
-            for (int i = 0; i < pixelSize; i++)
-            {
-                for (int j = 0; j < pixelSize; j++)
-                {
-                    // Calculate the offset for the current pixel
-                    int pixelOffset = (pixelY + i) * pitch + (pixelX + j) * (COLOR_DEPTH / 8);
-
-                    // Set the pixel color based on the font data
-                    unsigned int pixelColor = (pixel == 1) ? 0xFFFFFFFF : 0x00000000;
-
-                    // Set the pixel color in the framebuffer
-                    *((unsigned int*)(fb + pixelOffset)) = (attr & 0xFF000000) | pixelColor;
-                }
-            }
-        }
-    }
-}
-
-
-void printFont2(unsigned char *fontData, int x, int y, unsigned int color0, unsigned int color1, int pixelSize)
+void printFont(unsigned char *fontData, int x, int y, unsigned int color0, unsigned int color1, int pixelSize)
 {
     // Iterate through each row of the font data
     for (int row = 0; row < 8; row++)
@@ -184,9 +143,6 @@ void printFont2(unsigned char *fontData, int x, int y, unsigned int color0, unsi
     }
 }
 
-
-
-
 void printString(const char *str, int x, int y, unsigned int color0, unsigned int color1, int pixelSize)
 {
     int currentX = x;
@@ -205,7 +161,7 @@ void printString(const char *str, int x, int y, unsigned int color0, unsigned in
             unsigned char *fontData = getFontDataForCharacter(character);
 
             // Call the printFont2 function to print the character
-            printFont2(fontData, currentX, y, color0, color1, pixelSize);
+            printFont(fontData, currentX, y, color0, color1, pixelSize);
 
             // Move the currentX position to the next character's position
             currentX += (8 * pixelSize); // Assuming each character is 8 pixels wide
@@ -219,17 +175,13 @@ void printString(const char *str, int x, int y, unsigned int color0, unsigned in
     }
 }
 
-
-
 // Define font data for lowercase alphabet a to z and space
 unsigned char fontData[53 * 8] = {
     /* 'A' - ASCII 97 */
-    0x0C, 0x1E, 0x33, 0x33,
-    0x3F, 0x33, 0x33, 0x00,
+    0x0C, 0x1E, 0x33, 0x33, 0x3F, 0x33, 0x33, 0x00,
 
     /* 'B' - ASCII 98 */
-    0x3E, 0x33, 0x33, 0x3E,
-    0x3B, 0x33, 0x33, 0x3E,
+    0x3E, 0x33, 0x33, 0x3E, 0x3B, 0x33, 0x33, 0x3E,
 
     //'C'
     0x1E, 0x33, 0x30, 0x30, 0x30, 0x33, 0x1E, 0x00,
@@ -254,7 +206,6 @@ unsigned char fontData[53 * 8] = {
 
     //J
     0x0F, 0x06, 0x06, 0x06, 0x36, 0x36, 0x1C, 0x00,
-
 
     //K
     0x33, 0x36, 0x3C, 0x38, 0x3C, 0x36, 0x33, 0x00,
@@ -286,7 +237,6 @@ unsigned char fontData[53 * 8] = {
     //T
     0x3F, 0x0C, 0x0C, 0x0C, 0x0C, 0x0C, 0x0C, 0x00,
 
-
     //U
     0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x1E, 0x00,
 
@@ -314,7 +264,6 @@ unsigned char fontData[53 * 8] = {
     //c
     0x00, 0x00, 0x1F, 0x30, 0x30, 0x33, 0x1F, 0x00,
 
-
     //d
     0x06, 0x06, 0x1E, 0x36, 0x36, 0x36, 0x1F, 0x00,
 
@@ -338,7 +287,6 @@ unsigned char fontData[53 * 8] = {
 
     //k
     0x30, 0x30, 0x36, 0x3C, 0x38, 0x3C, 0x36, 0x00,
-    
 
     //l
     0x1C, 0x0C, 0x0C, 0x0C, 0x0C, 0x0C, 0x1E, 0x00,
@@ -346,7 +294,6 @@ unsigned char fontData[53 * 8] = {
     //m
     0x00, 0x00, 0x6E, 0x7F, 0x6B, 0x6B, 0x6B, 0x00,
     
-
     //n
     0x00, 0x00, 0x3E, 0x33, 0x33, 0x33, 0x33, 0x00,
 
@@ -386,11 +333,8 @@ unsigned char fontData[53 * 8] = {
     //z
     0x00, 0x00, 0x3F, 0x06, 0x0C, 0x18, 0x3F, 0x00,
 
-    
-
     /* ' ' (space) - ASCII 32 */
-    0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
 // Function to get font data for a character
