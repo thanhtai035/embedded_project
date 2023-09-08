@@ -28,16 +28,21 @@ asm volatile ("mrs %0, cntpct_el0" : "=r"(r));
 /* Function to wait for some msec: the program will stop there */
 void wait_msec(unsigned int n)
 {
-register unsigned long f, t, r, expiredTime;
-// Get the current counter frequency (Hz)
-asm volatile ("mrs %0, cntfrq_el0" : "=r"(f));
-// Read the current counter value
-asm volatile ("mrs %0, cntpct_el0" : "=r"(t));
-// Calculate expire value for counter
-expiredTime = t + ( (f/1000)*n )/1000;
-do {
-asm volatile ("mrs %0, cntpct_el0" : "=r"(r));
-} while(r < expiredTime);
+    volatile uint64_t f, t, r, expiredTime;
+
+    // Get the current counter frequency (Hz)
+    asm volatile ("mrs %0, cntfrq_el0" : "=r"(f));
+
+    // Read the current counter value
+    asm volatile ("mrs %0, cntpct_el0" : "=r"(t));
+
+    // Calculate expiration time for the counter
+    expiredTime = t + ((f * n) / 1000); // Convert milliseconds to microseconds
+
+    do {
+        // Read the current counter value
+        asm volatile ("mrs %0, cntpct_el0" : "=r"(r));
+    } while (r < expiredTime);
 }
 void main()
 {
@@ -56,7 +61,7 @@ int currentFrame = 0;
 displayImage(epd_bitmap_allArray[currentFrame], 320, 180);
 
 while(1) {
-wait_msec(100000);
+wait_msec(100);
 currentFrame++;
 if(currentFrame == 51)
     currentFrame = 0;
