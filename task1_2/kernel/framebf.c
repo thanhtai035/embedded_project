@@ -176,7 +176,7 @@ void printString(const char *str, int x, int y, unsigned int color0, unsigned in
 }
 
 // Define font data for lowercase alphabet a to z and space
-unsigned char fontData[63 * 8] = {
+unsigned char fontData[65 * 8] = {
     /* 'A' - ASCII 97 */
     0x0C, 0x1E, 0x33, 0x33, 0x3F, 0x33, 0x33, 0x00,
 
@@ -336,7 +336,6 @@ unsigned char fontData[63 * 8] = {
     /* ' ' (space) - ASCII 32 */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 
-
     // '0'
     0x1E, 0x33, 0x37, 0x3B, 0x33, 0x31, 0x1E, 0x00,
 
@@ -365,7 +364,14 @@ unsigned char fontData[63 * 8] = {
     0x1E, 0x33, 0x33, 0x1E, 0x33, 0x33, 0x1E, 0x00,
 
     // '9'
-    0x1E, 0x33, 0x33, 0x1F, 0x03, 0x33, 0x1E, 0x00
+    0x1E, 0x33, 0x33, 0x1F, 0x03, 0x33, 0x1E, 0x00,
+
+    /* '.' - ASCII 46 */
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x0C, 0x0C, 0x00,
+
+    /* ':' - ASCII 58 */
+    0x00, 0x00, 0x0C, 0x0C, 0x00, 0x0C, 0x0C, 0x00
+
 };
 
 // Function to get font data for a character
@@ -392,6 +398,16 @@ unsigned char *getFontDataForCharacter(char character)
     {
         // Return a pointer to the font data for space
         return &fontData[52 * 8]; // Space character is at the end of the array
+    }
+    else if (character == '.')
+    {
+        // Return a pointer to the font data for space
+        return &fontData[63 * 8]; // Space character is at the end of the array
+    }
+    else if (character == ':')
+    {
+        // Return a pointer to the font data for space
+        return &fontData[64 * 8]; // Space character is at the end of the array
     }
     else if (character >= '0' && character <= '9') {
         int index = character - '0' + 53;
