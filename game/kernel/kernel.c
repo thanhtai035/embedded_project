@@ -45,6 +45,8 @@ void renderCharacter(int xOffset, int yOffset) {
             drawPixelARGB32(x, y, screen[x][y].value);
         }
     }
+
+    printString("Score", 50, 50, 0, 0x00FF0000, 4);
 }
 
 
@@ -85,6 +87,8 @@ framebf_init();
 // displayImage(epd_bitmap_download__3__removebg_preview__1_, 217, 232, xOffset, yOffset);
 renderCharacter(xOffset, yOffset);
 // echo everything back
+
+
 while(1) {
 //read each char
 char c = uart_getc();
