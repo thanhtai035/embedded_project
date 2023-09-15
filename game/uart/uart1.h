@@ -21,3 +21,6 @@ char uart_getc();
 void uart_puts(char *s);
 void uart_hex(unsigned int num);
 void uart_dec(int num);
+unsigned int uart_isReadByteReady();
+unsigned char getUart();
+void set_wait_timer(int set, unsigned int msVal);
