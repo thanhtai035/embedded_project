@@ -116,9 +116,12 @@ void intToString(int value, char *str) {
 
 
 int showTime(int timeInSeconds) {
+
+    printString("Time", 800, 50, 0, 0x00FF0000, 4);
+
     // Calculate the position to display the time
     int x = 800;
-    int y = 50;
+    int y = 100;
     int fontSize = 4;
 
     // Convert the time to a string
@@ -210,6 +213,12 @@ void main()
 
         showTime(countTime);
         
+        set_wait_timer(1, 1000000);
+
+        countTime--;
+
+        set_wait_timer(0, 10);
+        
         //send back
         if (c == UP) {
             if (yOffset - PAN_STEP >= 0)
@@ -234,16 +243,11 @@ void main()
 
         }
 
-        //wait_msec(1000);
-
-        set_wait_timer(1, 1000000);
-
         // Decrement the countdown timer
         
-        countTime--;
-
+        
         // Disable the timer (wait for it to expire)
-        //set_wait_timer(0, 100);
+        
         
 
     }
