@@ -94,25 +94,6 @@ void intToString(int value, char *str) {
     }
 }
 
-
-
-// void showTime() {
-//     printString("Time", 800, 50, 0, 0x00FF0000, 4);
-
-//     int countTime = 60;
-
-//     while(countTime != 0) {
-//         char str[12];
-//         intToString(countTime, str);
-//         printString("  ", 800, 100, 0, 0x00FF0000, 4);
-//         printString(&str[0], 800, 100, 0, 0x00FF0000, 4);
-
-//         wait_msec(1000);
-//         countTime--;
-//     }
-// }
-
-
 int showTime(int timeInSeconds) {
 
     printString("Time: ", 10, 20, 0, 0x00FF0000, 3);
@@ -134,7 +115,6 @@ int showTime(int timeInSeconds) {
 
     return 0;
 }
-
 
 void startGame() {
     int xOffset = SCREEN_WIDTH / 2 - 100;
@@ -180,6 +160,22 @@ void showPause() {
     }
 }
 
+void winGame() {
+    clearScreen(0);
+
+    printString("Win!", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 40, 0, 0x00FF0000, 4);
+    printString("Press enter for next level", SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 + 10, 0, 0x00FF0000, 2);
+
+    //press enter to move next
+    while(1) {
+        char c = uart_getc();
+        if (c == '\n') {
+            // showTime();
+            break;
+        }
+    }
+}
+
 void displayLevel(int level) {
     printString("Lv. ", 904, 20, 0, 0x00FF0000, 3);
 
@@ -204,7 +200,7 @@ void main()
     int xOffset = SCREEN_WIDTH / 2;
     int yOffset = SCREEN_HEIGHT /3;
 
-    int gameLevel = 3;
+    int gameLevel = 1;
 
 
     // Define your step size for each arrow key press
@@ -221,10 +217,13 @@ void main()
 
 
     // set the timer
-    int countTime = 30;
+    int countTime = 10;
+    // int countTimefor2 = 30;
+    // int countTimefor3 = 60;
 
     renderCharacter(xOffset, yOffset);
 
+    int isLose = 0; // flag for dodge object which means lose
     
     // echo everything back
 
@@ -239,8 +238,7 @@ void main()
         showTime(countTime);
         displayLevel(gameLevel);
 
-        
-        set_wait_timer(1, 1000000);
+        set_wait_timer(1, 1000000); // this affect the logic delay,, how can we solve?
 
         countTime--;
 
@@ -255,6 +253,7 @@ void main()
             if (yOffset + PAN_STEP <= SCREEN_HEIGHT)
                 yOffset += PAN_STEP;        
             renderCharacter(xOffset, yOffset);
+            isLose = 1;
         } else if (c == LEFT) {
             if (xOffset - PAN_STEP >= 0)
                 xOffset -= PAN_STEP;
@@ -266,7 +265,15 @@ void main()
         } else if (c == '\n') {
             showPause();
             renderCharacter(xOffset, yOffset);
-        } else {
+        } else if (countTime == 0) {
+            winGame();
+            renderCharacter(xOffset, yOffset);
+            countTime = 30; // we can apply the time limit later
+            gameLevel += 1;
+        } /* else if (isLose == 1) {
+        //  lose logic
+        // } */
+        else {
 
         }
 

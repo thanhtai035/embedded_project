@@ -190,7 +190,7 @@ void printString(const char *str, int x, int y, unsigned int color0, unsigned in
 
 
 // Define font data for lowercase alphabet a to z and space
-unsigned char fontData[66 * 8] = {
+unsigned char fontData[67 * 8] = {
     //0
     0x0C, 0x1E, 0x33, 0x33, 0x33, 0x33, 0x1E, 0x0C,
 
@@ -391,8 +391,10 @@ unsigned char fontData[66 * 8] = {
     0x00, 0x00, 0x0C, 0x0C, 0x00, 0x0C, 0x0C, 0x00,
 
     // '_' - ASCII 95
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x00
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x00,
 
+    /* '!' - ASCII 33 */
+    0x0C, 0x0C, 0x0C, 0x0C, 0x0C, 0x0C, 0x00, 0x0C
 };
 
 
@@ -445,6 +447,11 @@ unsigned char *getFontDataForCharacter(char character)
     {
         // Return a pointer to the font data for space
         return &fontData[65 * 8]; // Space character is at the end of the array
+    }
+    else if (character == '!')
+    {
+        // Return a pointer to the font data for space
+        return &fontData[66 * 8]; // Space character is at the end of the array
     }
     else
     {
