@@ -111,3 +111,4 @@ void displayImage(const unsigned long* bitmap, int image_width, int image_height
         }
     }
 }
+

@@ -131,3 +131,13 @@ void uart_dec(int num)
 
 	uart_puts(str);
 }
+unsigned int uart_isReadByteReady(){
+	return (AUX_MU_LSR & 0x01);
+}
+
+unsigned char getUart(){
+unsigned char ch = 0;
+if (uart_isReadByteReady())
+ch = uart_getc();
+return ch;
+}
