@@ -143,9 +143,10 @@ void printFont(unsigned char *fontData, int x, int y, unsigned int color0, unsig
 
                     // Set the pixel color based on the font data
                     unsigned int pixelColor = (pixel == 1) ? color1 : color0;
-
-                    // Set the pixel color in the framebuffer
-                    *((unsigned int*)(fb + pixelOffset)) = pixelColor;
+                    if (pixelColor != color0) {
+                        // Set the pixel color in the framebuffer
+                        *((unsigned int*)(fb + pixelOffset)) = pixelColor;
+                    }
                 }
             }
         }
@@ -190,7 +191,7 @@ void printString(const char *str, int x, int y, unsigned int color0, unsigned in
 
 
 // Define font data for lowercase alphabet a to z and space
-fontData[67 * 8] = {
+unsigned char fontData[67 * 8] = {
     //0
     0x0C, 0x1E, 0x33, 0x33, 0x33, 0x33, 0x1E, 0x0C,
 
