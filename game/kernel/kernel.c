@@ -3,7 +3,6 @@
 #include "framebf.h"
 #include "../image/img1.c"
 #include "../image/img2.c"
-
 #include "../image/bom.c"
 
 #define PAN_STEP 50
@@ -13,7 +12,6 @@
 #define DOWN 's'
 #define LEFT 'a'
 #define RIGHT 'd'
-
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 768
 #define TIMER_RUNNING 0
@@ -23,6 +21,10 @@ int xOffset = SCREEN_WIDTH / 2;
 int yOffset = 460;
 int lastX = SCREEN_WIDTH / 2;
 int jump = 0;
+int isLose = 0; // flag for dodge object which means lose
+int countTime = 10;
+int stage = 2;
+int gameLevel = 1;
 
 struct PixelData
 {
@@ -32,10 +34,119 @@ struct PixelData
 
 struct PixelData screen[SCREEN_WIDTH][SCREEN_HEIGHT];
 
+void clearScreen(unsigned int backgroundColor);
+void showPause();
+void winGame();
+void displayLevel(int level);
+void updateCharacter();
+void updateBackground() ;
+void updateBom(int *bomX, int *bomY);
+void set_wait_timer(int set, unsigned int msVal);
+
+/* Function to start a timer (set = 1) or wait for it to expire (set = 0) */
+void set_wait_timer(int set, unsigned int msVal)
+{
+    static unsigned long expiredTime = 0; // declare static to keep value
+    register unsigned long r, f, t;
+    if (set)
+    { /* SET TIMER */
+        // Get the current counter frequency (Hz)
+        asm volatile("mrs %0, cntfrq_el0"
+                     : "=r"(f));
+        // Read the current counter
+        asm volatile("mrs %0, cntpct_el0"
+                     : "=r"(t));
+        // Calculate expired time:
+        // expiredTime = t + ((f / 1000) * msVal) / 1000;
+        expiredTime = t + ((f * msVal) / 1000);
+    }
+    else
+    { /* WAIT FOR TIMER TO EXPIRE */
+        do
+        {
+            asm volatile("mrs %0, cntpct_el0"
+                         : "=r"(r));
+        } while (r < expiredTime);
+    }
+}
+
+void main()
+{
+    int bomX = SCREEN_WIDTH / 2 - 32; // Initial X position of the bom
+    int bomY = 0;                     // Initial Y position of the bom
+
+    uart_init();
+    // say hello
+    uart_puts("\n\nHello World!\n");
+    framebf_init();
+    int count = 0;
+    unsigned char c;
+    startGame();
+    /*Draw character, rocket and background */
+    // updateBom(&bomX, &bomY);
+    // updateCharacter();
+    // updateBackground();
+
+    while (1)
+    {
+        if (stage == 1) {
+            startGame();
+        } else if (stage == 2) {
+            set_wait_timer(1, 10);
+
+            c = getUart();
+
+            if (c == UP) {
+                if (jump ==0) {
+                    jump = 4;
+                }
+                // updateCharacter();
+            } else if (c == LEFT) {
+                if (xOffset - PAN_STEP >= 0)
+                    xOffset -= PAN_STEP;
+                updateCharacter();
+
+            } else if (c == RIGHT) {
+                if (xOffset + PAN_STEP <= SCREEN_WIDTH)
+                    xOffset += PAN_STEP;
+                updateCharacter();
+
+            } 
+            set_wait_timer(0,10); 
+            count++; 
+            /*Animation to move rocket */
+            // if (count == 10 ) {
+            //     if (jump > 0) {
+            //         if (jump >= 3) {
+            //             yOffset -= PAN_STEP;
+            //         } else {
+            //             yOffset += PAN_STEP;
+            //         }
+            //         jump--;
+            //         updateCharacter();
+            //     }
+
+            //     updateBom(&bomX, &bomY);
+
+            //     // Check if the bom has reached the bottom of the screen
+            //     if (bomY >= SCREEN_HEIGHT)
+            //     {
+            //         // Reset the bom to the top of the screen
+            //         bomX = lastX; // Adjust the initial X position as needed
+            //         bomY = 0;
+            //     }
+            //     count = 0;
+            // }
+        }
+    }
+}
+
+// This function used to draw character
 void updateCharacter() {
     int image_width = 150;
     int image_height = 150;
 
+    // Loop through previous x and y to delete the character
     if (jump == 0) {
         for (int y = yOffset; y < yOffset + image_height; y++)
         {
@@ -84,13 +195,14 @@ void updateCharacter() {
         }
     }
 
+    // Draw character in new x and y
     for (int y = 0; y < image_height; y++) {
         for (int x = 0; x < image_width; x++) {
             int screen_x = x + xOffset; 
             int screen_y = y + yOffset;
             // Check if current position + offset is inside the screen bounds
             if (screen_x >= 0 && screen_x < SCREEN_WIDTH && screen_y >= 0 && screen_y < SCREEN_HEIGHT) {
-                unsigned int attr = character[y * image_width + x]; // Use the correct index for character_img
+                unsigned int attr = character[y * image_width + x]; 
                 if (attr != 0x0) {
                     screen[screen_x][screen_y].value = attr;
                     screen[screen_x][screen_y].status = 1;
@@ -103,7 +215,7 @@ void updateCharacter() {
 }
 
 
-
+// Draw the background intially
 void updateBackground() {
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
         for (int x = 0; x < SCREEN_WIDTH; x++) {
@@ -115,7 +227,7 @@ void updateBackground() {
     }
 }
 
-
+// Draw the bom
 void updateBom(int *bomX, int *bomY)
 {
     int image_width = 64;
@@ -159,113 +271,131 @@ void updateBom(int *bomX, int *bomY)
     }
 }
 
-void renderBom(int *bomX, int *bomY)
-{
-    updateBom(bomX, bomY);
-    // for (int y = 0; y < SCREEN_HEIGHT; y++)
-    // {
-    //     for (int x = 0; x < SCREEN_HEIGHT; x++)
-    //     {
-    //         drawPixelARGB32(x, y, screen[x][y].value);
-    //     }
-    // }
-}
 
-
-/* Function to start a timer (set = 1) or wait for it to expire (set = 0) */
-void set_wait_timer(int set, unsigned int msVal)
-{
-    static unsigned long expiredTime = 0; // declare static to keep value
-    register unsigned long r, f, t;
-    if (set)
-    { /* SET TIMER */
-        // Get the current counter frequency (Hz)
-        asm volatile("mrs %0, cntfrq_el0"
-                     : "=r"(f));
-        // Read the current counter
-        asm volatile("mrs %0, cntpct_el0"
-                     : "=r"(t));
-        // Calculate expired time:
-        // expiredTime = t + ((f / 1000) * msVal) / 1000;
-        expiredTime = t + ((f * msVal) / 1000);
+void intToString(int value, char *str) {
+    // Handle the case of a negative number
+    if (value < 0) {
+        *str++ = '-';
+        value = -value;
     }
-    else
-    { /* WAIT FOR TIMER TO EXPIRE */
-        do
-        {
-            asm volatile("mrs %0, cntpct_el0"
-                         : "=r"(r));
-        } while (r < expiredTime);
+
+    // Calculate the length of the string
+    int length = 0;
+    int temp = value;
+
+    do {
+        temp /= 10;
+        length++;
+    } while (temp != 0);
+
+    // Null-terminate the string
+    str[length] = '\0';
+
+    // Fill the string in reverse order
+    for (int i = length - 1; i >= 0; i--) {
+        str[i] = '0' + (value % 10);
+        value /= 10;
     }
 }
 
-void main()
-{
-    int bomX = SCREEN_WIDTH / 2 - 32; // Initial X position of the bom
-    int bomY = 0;                     // Initial Y position of the bom
-    // Define your step size for each arrow key press
-    // set up serial console
-    uart_init();
-    // say hello
-    uart_puts("\n\nHello World!\n");
-    framebf_init();
-    int count = 0;
-    renderBom(&bomX, &bomY);
-    unsigned char c;
+int showTime(int timeInSeconds) {
 
+    printString("Time: ", 10, 20, 0, 0x00FF0000, 3);
 
-    updateCharacter();
-    updateBackground();
+    // Calculate the position to display the time
+    int x = 150;
+    int y = 20;
+    int fontSize = 3;
 
-    // Initially, set the timer for, e.g., 2000 milliseconds (2 seconds).
-    // echo everything back
-    while (1)
-    {
-        set_wait_timer(1, 10);
+    // Convert the time to a string
+    char timeStr[3]; // Assuming you only need two digits for seconds
+    intToString(timeInSeconds, timeStr);
 
-        c = getUart();
+    // Clear the previous time display by drawing spaces
+    printString("  ", x, y, 0, 0x00FF0000, fontSize);
 
-        if (c == UP) {
-            if (jump ==0) {
-                jump = 4;
-            }
-            // updateCharacter();
-        } else if (c == LEFT) {
-            if (xOffset - PAN_STEP >= 0)
-                xOffset -= PAN_STEP;
-            updateCharacter();
+    // Display the new time
+    printString(timeStr, x, y, 0, 0x00FF0000, fontSize);
 
-        } else if (c == RIGHT) {
-            if (xOffset + PAN_STEP <= SCREEN_WIDTH)
-                xOffset += PAN_STEP;
-            updateCharacter();
+    return 0;
+}
 
-        } 
-        set_wait_timer(0,10); 
-        count++; 
-        if (count == 10 ) {
-            if (jump > 0) {
-                if (jump >= 3) {
-                    yOffset -= PAN_STEP;
-                } else {
-                    yOffset += PAN_STEP;
-                }
-                jump--;
-                updateCharacter();
-            }
+void startGame() {
+    int xOffset = SCREEN_WIDTH / 2 - 100;
+    int yOffset = SCREEN_HEIGHT /2 - 40;
 
-            renderBom(&bomX, &bomY);
+    printString("Start", xOffset, yOffset, 0, 0x00FF0000, 4);
+    //printString("__________", xOffset, yOffset + 30, 0, 0x00FF0000, 2);
 
-            // Check if the bom has reached the bottom of the screen
-            if (bomY >= SCREEN_HEIGHT)
-            {
-                // Reset the bom to the top of the screen
-                bomX = lastX; // Adjust the initial X position as needed
-                bomY = 0;
-            }
-            count = 0;
+    while(1) {
+        char c = uart_getc();
+
+        if (c == '\n') {
+            stage == 2;
+            printString("     ", xOffset, yOffset, 0, 0x00FF0000, 4);
+            //printString("      ", xOffset, yOffset+30, 0, 0x00FF0000, 4);
+
+            break;
         }
-
     }
+}
+
+void clearScreen(unsigned int backgroundColor)
+{
+    // Define the screen dimensions
+    int screenWidth = 1024; // Replace with your actual screen width
+    int screenHeight = 768; // Replace with your actual screen height
+
+    // Draw a filled rectangle covering the entire screen
+    drawRectARGB32(0, 0, screenWidth - 1, screenHeight - 1, backgroundColor, 1);
+}
+
+void showPause() {
+    clearScreen(0);
+
+    printString("Paused", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 40, 0, 0x00FF0000, 4);
+
+    while(1) {
+        char c = uart_getc();
+        if (c == '\n') {
+            // showTime();
+            break;
+        }
+    }
+}
+
+void winGame() {
+    clearScreen(0);
+
+    printString("Win!", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 40, 0, 0x00FF0000, 4);
+    printString("Press enter for next level", SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 + 10, 0, 0x00FF0000, 2);
+
+    //press enter to move next
+    while(1) {
+        char c = uart_getc();
+        if (c == '\n') {
+            // showTime();
+            break;
+        }
+    }
+}
+
+void displayLevel(int level) {
+    printString("Lv. ", 904, 20, 0x0, 0x00FF0000, 3);
+
+    // Convert the time to a string
+    char levelStr[1]; // Assuming you only need one digits for seconds
+    intToString(level, levelStr);
+
+    // Calculate the position to display
+    int x = 980;
+    int y = 16;
+    int fontSize = 3;
+
+    // Clear the previous level display by drawing spaces
+    printString("  ", x, y, 0x0, 0x00FF0000, fontSize);
+
+    // Display the new level
+    printString(levelStr, x, y, 0x0, 0x00FF0000, fontSize);
 }
       
