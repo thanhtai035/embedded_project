@@ -38,17 +38,15 @@ void updateCharacter(int xOffset, int yOffset) {
 }
 
 
-
 void renderCharacter(int xOffset, int yOffset) {
     updateCharacter(xOffset, yOffset);
-     for (int y = 0; y < SCREEN_HEIGHT; y++) {
+     for (int y = 50; y < SCREEN_HEIGHT; y++) { // to avoid the time text re-rendering
         for (int x = 0; x < SCREEN_HEIGHT; x++) {
             drawPixelARGB32(x, y, screen[x][y].value);
         }
     }
 
 }
-
 
 /* Function to wait for some msec: the program will stop there */
 void wait_msec(unsigned int n)
@@ -117,12 +115,12 @@ void intToString(int value, char *str) {
 
 int showTime(int timeInSeconds) {
 
-    printString("Time", 800, 50, 0, 0x00FF0000, 4);
+    printString("Time: ", 10, 20, 0, 0x00FF0000, 3);
 
     // Calculate the position to display the time
-    int x = 800;
-    int y = 100;
-    int fontSize = 4;
+    int x = 150;
+    int y = 20;
+    int fontSize = 3;
 
     // Convert the time to a string
     char timeStr[3]; // Assuming you only need two digits for seconds
@@ -139,15 +137,19 @@ int showTime(int timeInSeconds) {
 
 
 void startGame() {
-    int xOffset = SCREEN_WIDTH / 2;
-    int yOffset = SCREEN_HEIGHT /2;
+    int xOffset = SCREEN_WIDTH / 2 - 100;
+    int yOffset = SCREEN_HEIGHT /2 - 40;
 
     printString("Start", xOffset, yOffset, 0, 0x00FF0000, 4);
+    //printString("__________", xOffset, yOffset + 30, 0, 0x00FF0000, 2);
+
+
     while(1) {
         char c = uart_getc();
 
         if (c == '\n') {
             printString("     ", xOffset, yOffset, 0, 0x00FF0000, 4);
+            //printString("      ", xOffset, yOffset+30, 0, 0x00FF0000, 4);
 
             break;
         }
@@ -167,7 +169,7 @@ void clearScreen(unsigned int backgroundColor)
 void showPause() {
     clearScreen(0);
 
-    printString("Pause", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, 0x00FF0000, 4);
+    printString("Paused", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 40, 0, 0x00FF0000, 4);
 
     while(1) {
         char c = uart_getc();
@@ -178,18 +180,38 @@ void showPause() {
     }
 }
 
+void displayLevel(int level) {
+    printString("Lv. ", 904, 20, 0, 0x00FF0000, 3);
+
+    // Convert the time to a string
+    char levelStr[1]; // Assuming you only need one digits for seconds
+    intToString(level, levelStr);
+
+    // Calculate the position to display
+    int x = 980;
+    int y = 16;
+    int fontSize = 3;
+
+    // Clear the previous level display by drawing spaces
+    printString("  ", x, y, 0, 0x00FF0000, fontSize);
+
+    // Display the new level
+    printString(levelStr, x, y, 0, 0x00FF0000, fontSize);
+}
+
 void main()
 {
     int xOffset = SCREEN_WIDTH / 2;
     int yOffset = SCREEN_HEIGHT /3;
 
+    int gameLevel = 3;
 
 
     // Define your step size for each arrow key press
     // set up serial console
     uart_init();
     // say hello
-    uart_puts("\n\nHello World!\n");
+    // uart_puts("\n\nHello World!\n");
     // Initialize frame buffer
     framebf_init();
     // Draw something on the screen
@@ -198,7 +220,8 @@ void main()
     startGame();
 
 
-    int countTime = 60;
+    // set the timer
+    int countTime = 30;
 
     renderCharacter(xOffset, yOffset);
 
@@ -208,10 +231,14 @@ void main()
     //showTime();
 
     while(1) {
+
+        //renderCharacter(xOffset, yOffset);
         //read each char
         char c = getUart();
 
         showTime(countTime);
+        displayLevel(gameLevel);
+
         
         set_wait_timer(1, 1000000);
 
