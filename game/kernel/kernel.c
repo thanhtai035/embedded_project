@@ -87,12 +87,15 @@ void main()
                     if (timeCount == 0) {
                         timeCount = 15;
                         gameLevel++;
+                        if(gameLevel == 3) {
+                            stage = 5;
+                            continue;
+                        }
                     }
                     count = 0;
                 }
             }
             if (isLose == 1) {
-                uart_puts("lost");
                 stage = 4;
                 continue;
             }
@@ -111,9 +114,15 @@ void main()
             char c = uart_getc();
             if (c == '\n') {
                 resetVariable();
+            
             }
         } else {
-
+            winGame();
+            char c = uart_getc();
+            if (c == '\n') {
+                resetVariable();
+            
+            }
         }
     }
 }

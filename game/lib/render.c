@@ -9,12 +9,7 @@ void initScreen() {
         bombs[i].x = custom_rand(); // Random X position within screen width
         bombs[i].y = 0;             // Start at the top
     }
-    for (int i = 0; i < 5; i++)
-    {
-        updateBom(&bombs[i].x, &bombs[i].y);
-    }
 
-    updateBom(&bomX, &bomY);
     updateCharacter();
     updateBackground();
     // displayLevel(1);
