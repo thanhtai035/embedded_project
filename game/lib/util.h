@@ -2,30 +2,33 @@
 #define PROGMEM __attribute__((section(".rodata")))
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 768
-#define DROP_RATE 50 // Adjust the drop rate as needed
+#define DROP_RATE 50   // Adjust the drop rate as needed
+#define TRAVEL_RATE 25 // Adjust the travel rate as needed
 #define PAN_STEP 50
 #define JUMP_STEP 70
 
 extern int xOffset;
-extern int yOffset; 
+extern int yOffset;
 extern int lastX;
-extern int jump; 
+extern int jump;
 extern int timeCount;
 extern int count;
-extern int isLose; 
+extern int isLose;
 extern int stage;
 extern int gameLevel;
-extern int bomX; // Initial X position of the bom
-extern int bomY;                     // Initial Y position of the bom
+extern int bomX;  // Initial X position of the bom
+extern int bomY;  // Initial Y position of the bom
 extern int bomX1; // Initial X position of the bom
-extern int bomY1;    
+extern int bomY1;
 extern unsigned long next;
 extern int previous;
 
 extern const unsigned long bom_img[] PROGMEM;
-extern const unsigned long background [] PROGMEM;
-extern const unsigned long character [] PROGMEM;
-struct PixelData {
+extern const unsigned long background[] PROGMEM;
+extern const unsigned long character[] PROGMEM;
+extern const unsigned long bom_horizon_img[] PROGMEM;
+struct PixelData
+{
     unsigned long value;
     int status;
 };
@@ -35,7 +38,8 @@ struct Bomb
     int y;
 };
 
-extern struct PixelData screen[SCREEN_WIDTH][SCREEN_HEIGHT];    
+extern struct PixelData screen[SCREEN_WIDTH][SCREEN_HEIGHT];
 extern struct Bomb bombs[5];
+extern struct Bomb hBomb;
 
 void resetVariable();
