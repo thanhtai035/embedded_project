@@ -4,6 +4,7 @@
 #define SCREEN_HEIGHT 768
 #define DROP_RATE 50 // Adjust the drop rate as needed
 #define PAN_STEP 50
+#define JUMP_STEP 70
 
 extern int xOffset;
 extern int yOffset; 
@@ -36,3 +37,5 @@ struct Bomb
 
 extern struct PixelData screen[SCREEN_WIDTH][SCREEN_HEIGHT];    
 extern struct Bomb bombs[5];
+
+void resetVariable();

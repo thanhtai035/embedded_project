@@ -108,28 +108,23 @@ void updateCharacter() {
             }
         }
     }  else {
-
-        if (jump >= 3) {
-            for (int y = yOffset; y < yOffset + image_height + PAN_STEP; y++)
+        if (jump >=4 ) {
+            for (int y = yOffset; y < yOffset + image_height + JUMP_STEP; y++)
                 {
                 for (int x = xOffset; x < xOffset + image_width; x++)
                 {
-                    if (screen[x][y].status == 1)
-                    {
-                        unsigned int attr = background[y * SCREEN_WIDTH + x]; // Use the correct index for character_img
-                        screen[x][y].value = attr; // Clear the pixel
-                        drawPixelARGB32(x, y, attr);
-                        screen[x][y].status = 0;
-                    }
+                    unsigned int attr = background[y * SCREEN_WIDTH + x]; // Use the correct index for character_img
+                    screen[x][y].value = attr; // Clear the pixel
+                    drawPixelARGB32(x, y, attr);
+                    screen[x][y].status = 0;
                 }
             }
         } else {
-            for (int y = yOffset; y < yOffset + image_height - PAN_STEP; y++)
+            for (int y = yOffset - JUMP_STEP; y < yOffset + image_height + JUMP_STEP; y++)
                 {
                 for (int x = xOffset; x < xOffset + image_width; x++)
                 {
-                    if (screen[x][y].status == 1)
-                    {
+                    if (screen[x][y].status == 1) {
                         unsigned int attr = background[y * SCREEN_WIDTH + x]; // Use the correct index for character_img
                         screen[x][y].value = attr; // Clear the pixel
                         drawPixelARGB32(x, y, attr);
@@ -149,7 +144,7 @@ void updateCharacter() {
             if (screen_x >= 0 && screen_x < SCREEN_WIDTH && screen_y >= 0 && screen_y < SCREEN_HEIGHT) {
                 unsigned int attr = character[y * image_width + x]; 
                 if (attr != 0x0) {
-                    if (sceen[x][y].status == 2) {
+                    if (screen[screen_x][screen_y].status == 2) {
                         isLose = 1;
                     }
                     screen[screen_x][screen_y].value = attr;

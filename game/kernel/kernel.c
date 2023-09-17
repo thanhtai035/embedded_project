@@ -38,7 +38,7 @@ void main()
 
             if (c == UP) {
                 if (jump == 0) {
-                    jump = 4;
+                    jump = 6;
                 }
             } else if (c == LEFT) {
                 if (xOffset - PAN_STEP >= 0)
@@ -57,6 +57,15 @@ void main()
         
             if (count % 10 == 0)
             {
+                if (jump > 0) {
+                    if (jump >=4) {
+                        yOffset -= JUMP_STEP;
+                    } else {
+                        yOffset += JUMP_STEP;
+                    }
+                    updateCharacter();
+                    jump--;
+                }
                 for (int i = 0; i < 5; i++)
                 {
                     updateBom(&bombs[i].x, &bombs[i].y);
@@ -82,6 +91,11 @@ void main()
                     count = 0;
                 }
             }
+            if (isLose == 1) {
+                uart_puts("lost");
+                stage = 4;
+                continue;
+            }
         } else if(stage == 3) {
             showPause();
             char c = uart_getc();
@@ -92,6 +106,14 @@ void main()
                 stage = 2;
                 continue;
             }
+        } else if (stage == 4) {
+            printString("You lost!", SCREEN_WIDTH / 2 - 200, 200, 0, 0x00FF0000, 6);
+            char c = uart_getc();
+            if (c == '\n') {
+                resetVariable();
+            }
+        } else {
+
         }
     }
 }

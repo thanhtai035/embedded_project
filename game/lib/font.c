@@ -51,6 +51,7 @@ int showTime(int timeInSeconds) {
 }
 
 void startGame() {
+    clearScreen();
     int xOffset = SCREEN_WIDTH / 2 - 100;
     int yOffset = SCREEN_HEIGHT /2 - 40;
 
