@@ -1,8 +1,10 @@
 #--------------------------------------Makefile-------------------------------------
 
 CFILES = $(wildcard ./kernel/*.c)
+LIB_CFILES := $(wildcard ./lib/*.c)
 OFILES = $(CFILES:./kernel/%.c=./build/%.o)
 GCCFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib
+LIB_OFILES := $(LIB_CFILES:./lib/%.c=./build/%.o)
 
 all: clean uart1_build kernel8.img run1
 uart1: clean uart1_build kernel8.img run1
@@ -23,8 +25,11 @@ uart0_build: ./uart/uart0.c
 ./build/%.o: ./kernel/%.c
 	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
 
-kernel8.img: ./build/boot.o ./build/uart.o $(OFILES)
-	aarch64-none-elf-ld -nostdlib ./build/boot.o ./build/uart.o $(OFILES) -T ./kernel/link.ld -o ./build/kernel8.elf
+./build/%.o: ./lib/%.c
+	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
+
+kernel8.img: ./build/boot.o ./build/uart.o $(OFILES) $(LIB_OFILES)
+	aarch64-none-elf-ld -nostdlib ./build/boot.o ./build/uart.o $(OFILES) $(LIB_OFILES) -T ./kernel/link.ld -o ./build/kernel8.elf
 	aarch64-none-elf-objcopy -O binary ./build/kernel8.elf kernel8.img
 
 clean:
