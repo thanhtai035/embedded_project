@@ -103,67 +103,68 @@ void main()
 
                 if (gameLevel == 2)
                 {
-                    updateBom(&bombs[bomIndex].x, &bombs[bomIndex].y);
+                    updateBom(&bombs[0].x, &bombs[0].y);
+
                     if (count % 20)
                     {
-                        updateBom(&bombs[bomIndex + 1].x, &bombs[bomIndex + 1].y);
+                        updateBom(&bombs[1].x, &bombs[1].y);
                     }
                 }
 
                 if (gameLevel == 3)
                 {
-                    updateBom(&bombs[bomIndex].x, &bombs[bomIndex].y);
+                    updateBom(&bombs[0].x, &bombs[0].y);
                     if (count % 20)
                     {
-                        updateBom(&bombs[bomIndex + 1].x, &bombs[bomIndex + 1].y);
+                        updateBom(&bombs[1].x, &bombs[1].y);
                     }
 
                     if (count % 30)
                     {
-                        updateBom(&bombs[bomIndex + 2].x, &bombs[bomIndex + 2].y);
+                        updateBom(&bombs[2].x, &bombs[2].y);
                     }
                 }
 
                 if (gameLevel == 4)
                 {
-                    updateBom(&bombs[bomIndex].x, &bombs[bomIndex].y);
+                    updateBom(&bombs[0].x, &bombs[0].y);
                     if (count % 20)
                     {
-                        updateBom(&bombs[bomIndex + 1].x, &bombs[bomIndex + 1].y);
+                        updateBom(&bombs[1].x, &bombs[1].y);
                     }
 
                     if (count % 30)
                     {
-                        updateBom(&bombs[bomIndex + 2].x, &bombs[bomIndex + 2].y);
+                        updateBom(&bombs[2].x, &bombs[2].y);
                     }
 
                     if (count % 40)
                     {
-                        updateBom(&bombs[bomIndex + 3].x, &bombs[bomIndex + 3].y);
+                        updateBom(&bombs[3].x, &bombs[3].y);
                     }
                 }
 
                 if (gameLevel == 5)
                 {
-                    updateBom(&bombs[bomIndex].x, &bombs[bomIndex].y);
+                    updateBom(&bombs[0].x, &bombs[0].y);
                     if (count % 20)
                     {
-                        updateBom(&bombs[bomIndex + 1].x, &bombs[bomIndex + 1].y);
+                        updateBom(&bombs[1].x, &bombs[1].y);
                     }
 
                     if (count % 30)
                     {
-                        updateBom(&bombs[bomIndex + 2].x, &bombs[bomIndex + 2].y);
+                        updateBom(&bombs[2].x, &bombs[2].y);
                     }
 
                     if (count % 40)
                     {
-                        updateBom(&bombs[bomIndex + 3].x, &bombs[bomIndex + 3].y);
+                        updateBom(&bombs[3].x, &bombs[3].y);
                     }
 
                     if (count % 50)
                     {
-                        updateBom(&bombs[bomIndex + 4].x, &bombs[bomIndex + 4].y);
+                        updateBom(&bombs[4].x, &bombs[4].y);
                     }
                 }
 
@@ -180,7 +181,7 @@ void main()
 
                     if (count % 20)
                     {
-                        updateBom(&bombs[bomIndex + 1].x, &bombs[bomIndex + 1].y);
+                        updateBom(&bombs[1].x, &bombs[1].y);
                     }
                 }
 
@@ -192,11 +193,11 @@ void main()
 
                     if (count % 20)
                     {
-                        updateBom(&bombs[bomIndex + 1].x, &bombs[bomIndex + 1].y);
+                        updateBom(&bombs[1].x, &bombs[1].y);
                     }
                     if (count % 30)
                     {
-                        updateBom(&bombs[bomIndex + 2].x, &bombs[bomIndex + 2].y);
+                        updateBom(&bombs[2].x, &bombs[2].y);
                     }
                 }
 
@@ -207,17 +208,17 @@ void main()
 
                     if (count % 20)
                     {
-                        updateBom(&bombs[bomIndex + 1].x, &bombs[bomIndex + 1].y);
+                        updateBom(&bombs[1].x, &bombs[1].y);
                     }
 
                     if (count % 30)
                     {
-                        updateBom(&bombs[bomIndex + 2].x, &bombs[bomIndex + 2].y);
+                        updateBom(&bombs[2].x, &bombs[2].y);
                     }
 
                     if (count % 40)
                     {
-                        updateBom(&bombs[bomIndex + 3].x, &bombs[bomIndex + 3].y);
+                        updateBom(&bombs[3].x, &bombs[3].y);
                     }
                 }
 
@@ -228,35 +229,34 @@ void main()
 
                     if (count % 20)
                     {
-                        updateBom(&bombs[bomIndex + 1].x, &bombs[bomIndex + 1].y);
+                        updateBom(&bombs[1].x, &bombs[1].y);
                     }
 
                     if (count % 30)
                     {
-                        updateBom(&bombs[bomIndex + 2].x, &bombs[bomIndex + 2].y);
+                        updateBom(&bombs[2].x, &bombs[2].y);
                     }
 
                     if (count % 40)
                     {
-                        updateBom(&bombs[bomIndex + 3].x, &bombs[bomIndex + 3].y);
+                        updateBom(&bombs[3].x, &bombs[3].y);
                     }
 
                     if (count % 50)
                     {
-                        updateBom(&bombs[bomIndex + 4].x, &bombs[bomIndex + 4].y);
+                        updateBom(&bombs[4].x, &bombs[4].y);
                     }
                 }
 
                 // Check if the bom has reached the bottom of the screen
-                if (bombs[bomIndex].y >= SCREEN_HEIGHT)
+                for (int i = 0; i < 5; i++)
                 {
+                    if (bombs[i].y >= SCREEN_HEIGHT)
+                    {
 
-                    bombs[bomIndex].x = custom_rand(); // Random X position within screen width
-                    bombs[bomIndex].y = 0;             // Start at the top
-
-                    bomIndex++;
-                    if (bomIndex == 5)
-                        bomIndex = 0;
+                        bombs[i].x = custom_rand(); // Random X position within screen width
+                        bombs[i].y = 0;             // Start at the top
+                    }
                 }
 
                 if (hBomb.x >= SCREEN_WIDTH)
@@ -273,7 +273,9 @@ void main()
                     {
                         timeCount = 15;
                         gameLevel++;
-                        if (gameLevel == 3)
+
+                        updateBackground();
+                        if (gameLevel == 10)
                         {
                             stage = 5;
                             continue;
@@ -296,6 +298,7 @@ void main()
             {
                 displayLevel(gameLevel);
                 showTime(timeCount);
+
                 updateBackground();
                 stage = 2;
                 continue;
