@@ -3,12 +3,16 @@
 #include "font.h"
 #include "../uart/uart1.h"
 
-void initScreen() {
+void initScreen()
+{
     for (int i = 0; i < 5; i++)
     {
         bombs[i].x = custom_rand(); // Random X position within screen width
         bombs[i].y = 0;             // Start at the top
     }
+
+    hBomb.x = 0;
+    hBomb.y = 530;
 
     updateCharacter();
     updateBackground();
@@ -16,7 +20,8 @@ void initScreen() {
     // showtime(timeCount);
 }
 
-void resumeScreen() {
+void resumeScreen()
+{
     updateBackground();
 }
 
@@ -32,10 +37,11 @@ void updateBom(int *bomX, int *bomY)
         for (int x = *bomX; x < *bomX + image_width; x++)
         {
             if (x >= 0 && x < SCREEN_WIDTH && y >= 0 && y < SCREEN_HEIGHT)
-            {   
-                if(screen[x][y].status != 1 ) {
+            {
+                if (screen[x][y].status != 1)
+                {
                     unsigned int attr = background[y * SCREEN_WIDTH + x]; // Use the correct index for character_img
-                    screen[x][y].value = attr; // Clear the pixel
+                    screen[x][y].value = attr;                            // Clear the pixel
                     drawPixelARGB32(x, y, attr);
                     screen[x][y].status = 0;
                 }
@@ -54,27 +60,33 @@ void updateBom(int *bomX, int *bomY)
             if (x >= 0 && x < SCREEN_WIDTH && y >= 0 && y < SCREEN_HEIGHT)
             {
                 unsigned int attr = bom_img[(y - *bomY) * image_width + (x - *bomX)];
-                if (attr != 0) {
-                    if (screen[x][y].status != 1) {
-                    screen[x][y].value = attr;
-                    screen[x][y].status = 2;
-                    drawPixelARGB32(x, y, screen[x][y].value);
-                    } else
+                if (attr != 0)
+                {
+                    if (screen[x][y].status != 1)
+                    {
+                        screen[x][y].value = attr;
+                        screen[x][y].status = 2;
+                        drawPixelARGB32(x, y, screen[x][y].value);
+                    }
+                    else
                     {
                         isLose = 1;
                     }
                 }
-                
             }
         }
     }
-    for (int y = 20; y < 20 + 3 * 8; y++) {
-        for (int x = 150; x < 150 + 3*8*3; x++ ) {
+    for (int y = 20; y < 20 + 3 * 8; y++)
+    {
+        for (int x = 150; x < 150 + 3 * 8 * 3; x++)
+        {
             drawPixelARGB32(x, y, background[y * SCREEN_WIDTH + x]);
         }
     }
-    for (int y = 16; y < 16 + 3 * 8; y++) {
-        for (int x = 980; x < 980 + 3*8*2; x++ ) {
+    for (int y = 16; y < 16 + 3 * 8; y++)
+    {
+        for (int x = 980; x < 980 + 3 * 8 * 2; x++)
+        {
             drawPixelARGB32(x, y, background[y * SCREEN_WIDTH + x]);
         }
     }
@@ -83,12 +95,14 @@ void updateBom(int *bomX, int *bomY)
 }
 
 // This function used to draw character
-void updateCharacter() {
+void updateCharacter()
+{
     int image_width = 150;
     int image_height = 150;
 
     // Loop through previous x and y to delete the character
-    if (jump == 0) {
+    if (jump == 0)
+    {
         for (int y = yOffset; y < yOffset + image_height; y++)
         {
             for (int x = xOffset; x < xOffset + image_width; x++)
@@ -96,32 +110,38 @@ void updateCharacter() {
                 if (screen[x][y].status == 1)
                 {
                     unsigned int attr = background[y * SCREEN_WIDTH + x]; // Use the correct index for character_img
-                    screen[x][y].value = attr; // Clear the pixel
+                    screen[x][y].value = attr;                            // Clear the pixel
                     drawPixelARGB32(x, y, attr);
                     screen[x][y].status = 0;
                 }
             }
         }
-    }  else {
-        if (jump >=4 ) {
+    }
+    else
+    {
+        if (jump >= 4)
+        {
             for (int y = yOffset; y < yOffset + image_height + JUMP_STEP; y++)
-                {
+            {
                 for (int x = xOffset; x < xOffset + image_width; x++)
                 {
                     unsigned int attr = background[y * SCREEN_WIDTH + x]; // Use the correct index for character_img
-                    screen[x][y].value = attr; // Clear the pixel
+                    screen[x][y].value = attr;                            // Clear the pixel
                     drawPixelARGB32(x, y, attr);
                     screen[x][y].status = 0;
                 }
             }
-        } else {
+        }
+        else
+        {
             for (int y = yOffset - JUMP_STEP; y < yOffset + image_height + JUMP_STEP; y++)
-                {
+            {
                 for (int x = xOffset; x < xOffset + image_width; x++)
                 {
-                    if (screen[x][y].status == 1) {
+                    if (screen[x][y].status == 1)
+                    {
                         unsigned int attr = background[y * SCREEN_WIDTH + x]; // Use the correct index for character_img
-                        screen[x][y].value = attr; // Clear the pixel
+                        screen[x][y].value = attr;                            // Clear the pixel
                         drawPixelARGB32(x, y, attr);
                         screen[x][y].status = 0;
                     }
@@ -131,15 +151,20 @@ void updateCharacter() {
     }
 
     // Draw character in new x and y
-    for (int y = 0; y < image_height; y++) {
-        for (int x = 0; x < image_width; x++) {
-            int screen_x = x + xOffset; 
+    for (int y = 0; y < image_height; y++)
+    {
+        for (int x = 0; x < image_width; x++)
+        {
+            int screen_x = x + xOffset;
             int screen_y = y + yOffset;
             // Check if current position + offset is inside the screen bounds
-            if (screen_x >= 0 && screen_x < SCREEN_WIDTH && screen_y >= 0 && screen_y < SCREEN_HEIGHT) {
-                unsigned int attr = character[y * image_width + x]; 
-                if (attr != 0x0) {
-                    if (screen[screen_x][screen_y].status == 2) {
+            if (screen_x >= 0 && screen_x < SCREEN_WIDTH && screen_y >= 0 && screen_y < SCREEN_HEIGHT)
+            {
+                unsigned int attr = character[y * image_width + x];
+                if (attr != 0x0)
+                {
+                    if (screen[screen_x][screen_y].status == 2)
+                    {
                         isLose = 1;
                     }
                     screen[screen_x][screen_y].value = attr;
@@ -152,13 +177,16 @@ void updateCharacter() {
     lastX = xOffset;
 }
 
-
 // Draw the background intially
-void updateBackground() {
-    for (int y = 0; y < SCREEN_HEIGHT; y++) {
-        for (int x = 0; x < SCREEN_WIDTH; x++) {
-            if (screen[x][y].value == 0x0 || screen[x][y].status == 0) {
-                unsigned int attr = background[y * SCREEN_WIDTH + x]; 
+void updateBackground()
+{
+    for (int y = 0; y < SCREEN_HEIGHT; y++)
+    {
+        for (int x = 0; x < SCREEN_WIDTH; x++)
+        {
+            if (screen[x][y].value == 0x0 || screen[x][y].status == 0)
+            {
+                unsigned int attr = background[y * SCREEN_WIDTH + x];
                 drawPixelARGB32(x, y, attr);
             }
         }
@@ -191,4 +219,71 @@ int custom_rand()
             return rand_num;
         }
     }
+}
+
+// Draw the bom horizontally
+void updateBomHorizontal(int *bomX, int *bomY)
+{
+    int image_width = 64;
+    int image_height = 64;
+
+    // Clear the previous position of the bom
+    for (int y = *bomY; y < *bomY + image_height; y++)
+    {
+        for (int x = *bomX; x < *bomX + image_width; x++)
+        {
+            if (x >= 0 && x < SCREEN_WIDTH && y >= 0 && y < SCREEN_HEIGHT)
+            {
+                if (screen[x][y].status != 1)
+                {
+                    unsigned int attr = background[y * SCREEN_WIDTH + x]; // Use the correct index for character_img
+                    screen[x][y].value = attr;                            // Clear the pixel
+                    drawPixelARGB32(x, y, attr);
+                    screen[x][y].status = 0;
+                }
+            }
+        }
+    }
+
+    // Update the position of the bom one step to the right
+    *bomX += TRAVEL_RATE;
+
+    // Draw the bom at the new position
+    for (int y = *bomY; y < *bomY + image_height; y++)
+    {
+        for (int x = *bomX; x < *bomX + image_width; x++)
+        {
+            if (x >= 0 && x < SCREEN_WIDTH && y >= 0 && y < SCREEN_HEIGHT)
+            {
+                unsigned int attr = bom_horizon_img[(y - *bomY) * image_width + (x - *bomX)];
+                if (attr != 0)
+                {
+                    if (screen[x][y].status != 1)
+                    {
+                        screen[x][y].value = attr;
+                        screen[x][y].status = 2;
+                        drawPixelARGB32(x, y, screen[x][y].value);
+                    }
+                    else
+                    {
+                        isLose = 1;
+                    }
+                }
+            }
+        }
+    }
+    // Clear the remaining areas to the right of the bom
+    // for (int y = *bomY; y < *bomY + image_height; y++)
+    // {
+    //     for (int x = *bomX + image_width; x < *bomX + image_width + TRAVEL_RATE; x++)
+    //     {
+    //         if (x >= 0 && x < SCREEN_WIDTH && y >= 0 && y < SCREEN_HEIGHT)
+    //         {
+    //             unsigned int attr = background[y * SCREEN_WIDTH + x]; // Use the correct index for character_img
+    //             screen[x][y].value = attr;                            // Clear the pixel
+    //             drawPixelARGB32(x, y, attr);
+    //             screen[x][y].status = 0;
+    //         }
+    //     }
+    // }
 }
