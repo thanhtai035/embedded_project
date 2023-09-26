@@ -65,6 +65,7 @@ void main()
         } 
         else {
             gameOperation(); // Run the game
+            task = MENU;
         }
     }
 }
@@ -73,7 +74,7 @@ void main()
 void showMenu() {
     clearScreen();
     resetVariable(); // Reset variable of the game when get back to main menu
-
+    stage = 0;
 
     uart_puts("\n\nEmbedded Systems: Operating Systems & Interfacing - Group 1\n");
     uart_puts("1. Task 1a, part i - Scroll for big image\n");
@@ -200,9 +201,9 @@ void task1_1c_operation() {
 void task1_2_operation() {
     // Display the name of the students
     // The implementation of the function is in the framebf library
-    printString("Jaeheon Jeong", 50, 50, 0, 0x00AA0000, 4);
-    printString("Sanghwa Jung", 50, 100, 0, 0x0000BB00, 4);
-    printString("Le Thanh Tai", 50, 150, 0, 0x000000CC, 4);
+    printString("Jaeheon Jeong", 50, 50, 0xFFFF00, 0x00AA0000, 4);
+    printString("Sanghwa Jung", 50, 100, 0x00FFFFFF, 0x0000BB00, 4);
+    printString("Le Thanh Tai", 50, 150, 0x0000BB00, 0x000000CC, 4);
     printString("Vo Hoang Tuan", 50, 200, 0x000000CC, 0x00FFFF00, 4);
 
     while(1) {
@@ -214,7 +215,9 @@ void task1_2_operation() {
 
 // Method to implement game logic
 void gameOperation() {
-    while(1) {
+    stage = 1; // Start the game
+    int outGame = 0;
+    while(outGame == 0) {
         if (stage == 1) { // Start game stage
             startGame(); // Display message
             while(1) {
@@ -222,8 +225,10 @@ void gameOperation() {
                 if (c == '\n') { // Get enter to move to stage 2
                     printString("     ", xOffset, yOffset, 0, TEXT_COLOR, 4);
                     break;
-                } else if (c == TAB)
+                } else if (c == TAB) {
+                    outGame = 1;
                     break;
+                }
             }
             stage = 2;
             initScreen(); // Init the character, bomb and background
@@ -247,7 +252,7 @@ void gameOperation() {
                 stage = 3;
                 continue;
             } else if (c == TAB)
-                break;
+                outGame = 1;
 
             set_wait_timer(0, 10);
             count++; // Count increase every 10ms
@@ -289,7 +294,7 @@ void gameOperation() {
                         gameLevel++;
 
                         updateBackground();
-                        if (gameLevel == 11) { // Win game condition
+                        if (gameLevel > 6) { // Win game condition
                             stage = 5; // Move to stage 5 (win game stage)
                             continue;
                         }
@@ -311,7 +316,7 @@ void gameOperation() {
                 updateBackground();
                 stage = 2;
             } else if (c == TAB)
-                break;
+                outGame = 1;
         }
         else if (stage == 4) { // Lose game stage
             loseGame(); // Display message
@@ -319,14 +324,14 @@ void gameOperation() {
             if (c == ENTER)
                 resetVariable(); // Reset variable to start a new game
             else if (c == TAB)
-                    break;
+                outGame = 1;
         } else {
             winGame(); // Display message
             char c = uart_getc();
             if (c == ENTER)
                 resetVariable(); // Reset variable to start a new game
             else if (c == TAB)
-                    break;
+                outGame = 1;
         }
     }
 }
@@ -404,80 +409,6 @@ void updateDifficulty() {
     {
         updateBomHorizontal(&hBomb.x, &hBomb.y);
         updateBom(&bombs[bomIndex].x, &bombs[bomIndex].y);
-    }
-
-    if (gameLevel == 7)
-    {
-        updateBomHorizontal(&hBomb.x, &hBomb.y);
-        updateBom(&bombs[bomIndex].x, &bombs[bomIndex].y);
-
-        if (count % 20)
-        {
-            updateBom(&bombs[1].x, &bombs[1].y);
-        }
-    }
-
-    if (gameLevel == 8)
-    {
-        updateBomHorizontal(&hBomb.x, &hBomb.y);
-
-        updateBom(&bombs[bomIndex].x, &bombs[bomIndex].y);
-
-        if (count % 20)
-        {
-            updateBom(&bombs[1].x, &bombs[1].y);
-        }
-        if (count % 30)
-        {
-            updateBom(&bombs[2].x, &bombs[2].y);
-        }
-    }
-
-    if (gameLevel == 9)
-    {
-        updateBomHorizontal(&hBomb.x, &hBomb.y);
-        updateBom(&bombs[bomIndex].x, &bombs[bomIndex].y);
-
-        if (count % 20)
-        {
-            updateBom(&bombs[1].x, &bombs[1].y);
-        }
-
-        if (count % 30)
-        {
-            updateBom(&bombs[2].x, &bombs[2].y);
-        }
-
-        if (count % 40)
-        {
-            updateBom(&bombs[3].x, &bombs[3].y);
-        }
-    }
-
-    if (gameLevel == 10)
-    {
-        updateBomHorizontal(&bombs[5].x, &bombs[5].y);
-        updateBom(&bombs[bomIndex].x, &bombs[bomIndex].y);
-
-        if (count % 20)
-        {
-            updateBom(&bombs[1].x, &bombs[1].y);
-        }
-
-        if (count % 30)
-        {
-            updateBom(&bombs[2].x, &bombs[2].y);
-        }
-
-        if (count % 40)
-        {
-            updateBom(&bombs[3].x, &bombs[3].y);
-        }
-
-        if (count % 50)
-        {
-            updateBom(&bombs[4].x, &bombs[4].y);
-        }
     }
 }
 

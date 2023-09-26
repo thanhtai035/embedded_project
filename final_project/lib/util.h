@@ -29,6 +29,7 @@ extern int bomY1;
 extern unsigned long next;
 extern int previous;
 extern int bomIndex;
+extern int bomIndex;
 
 // Images values
 extern const unsigned long bom_img[] PROGMEM;

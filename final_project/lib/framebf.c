@@ -2,6 +2,7 @@
 #include "../kernel/mbox.h"
 #include "../uart/uart1.h"
 #include "framebf.h"
+#include "util.h"
 
 //Use RGBA32 (32 bits for each pixel)
 #define COLOR_DEPTH 32
@@ -114,7 +115,33 @@ void drawRectARGB32(int x1, int y1, int x2, int y2, unsigned int attr, int fill)
     }
 }
 
+// Method to display and scroll for bigger image
+void scrollImage(const unsigned long* bitmap, int image_width, int image_height, int xOffset, int yOffset) {
+    // Loop through each pixel of the image and print out accoringly
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            // Check if current position + offset is inside the image bounds 
+            // Only display pixels in the bound
+            if ((x + xOffset) < image_width && (y + yOffset) < image_height) {
+                unsigned int attr = bitmap[(y + yOffset) * image_width + (x + xOffset)];
+                drawPixelARGB32(x, y, attr);
+            }
+        }
+    }
+}
 
+// Method to display image
+void displayImage(const unsigned long* bitmap, int image_width, int image_height) {
+    // Loop through each pixel of the image and print out accoringly
+    for (int y = 0; y < image_height; y++) {
+        for (int x = 0; x < image_width; x++) {
+            unsigned int attr = bitmap[y * image_width + x];
+            drawPixelARGB32(x, y, attr); 
+        }
+    }
+}
+
+// Method to print character using the provided font
 void printFont(unsigned char *fontData, int x, int y, unsigned int color0, unsigned int color1, int pixelSize)
 {
     // Iterate through each row of the font data
@@ -143,9 +170,14 @@ void printFont(unsigned char *fontData, int x, int y, unsigned int color0, unsig
 
                     // Set the pixel color based on the font data
                     unsigned int pixelColor = (pixel == 1) ? color1 : color0;
-                    if (pixelColor != color0) {
+                    if (stage == 0) { // display play also the background color for task 1
                         // Set the pixel color in the framebuffer
                         *((unsigned int*)(fb + pixelOffset)) = pixelColor;
+                    } else { // not displaying the background color to be used in the game
+                       if (pixelColor != color0) {
+                        // Set the pixel color in the framebuffer
+                            *((unsigned int*)(fb + pixelOffset)) = pixelColor;
+                        }
                     } 
                 }
             }
@@ -153,31 +185,6 @@ void printFont(unsigned char *fontData, int x, int y, unsigned int color0, unsig
     }
 }
 
-// Method to display and scroll for bigger image
-void scrollImage(const unsigned long* bitmap, int image_width, int image_height, int xOffset, int yOffset) {
-    // Loop through each pixel of the image and print out accoringly
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            // Check if current position + offset is inside the image bounds 
-            // Only display pixels in the bound
-            if ((x + xOffset) < image_width && (y + yOffset) < image_height) {
-                unsigned int attr = bitmap[(y + yOffset) * image_width + (x + xOffset)];
-                drawPixelARGB32(x, y, attr);
-            }
-        }
-    }
-}
-
-// Method to display image
-void displayImage(const unsigned long* bitmap, int image_width, int image_height) {
-    // Loop through each pixel of the image and print out accoringly
-    for (int y = 0; y < image_height; y++) {
-        for (int x = 0; x < image_width; x++) {
-            unsigned int attr = bitmap[y * image_width + x];
-            drawPixelARGB32(x, y, attr); 
-        }
-    }
-}
 
 // Method using font to display string
 void printString(const char *str, int x, int y, unsigned int color0, unsigned int color1, int pixelSize)
