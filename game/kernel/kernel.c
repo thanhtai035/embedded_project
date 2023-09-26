@@ -18,11 +18,8 @@ void main()
     uart_init();
     framebf_init();
 
-    // set the timer
     int countTime = 10;
     int bomIndex = 0;
-    // int countTimefor2 = 30;
-    // int countTimefor3 = 60;
 
     unsigned char c;
 
@@ -82,22 +79,6 @@ void main()
                     updateCharacter();
                     jump--;
                 }
-                // for (int i = 0; i < 5; i++)
-                // {
-                //     updateBom(&bombs[i].x, &bombs[i].y);
-                // }
-
-                // // Check if the bom has reached the bottom of the screen
-                // if (bombs[0].y >= SCREEN_HEIGHT)
-                // {
-
-                //     for (int i = 0; i < 5; i++)
-                //     {
-
-                //         bombs[i].x = custom_rand(); // Random X position within screen width
-                //         bombs[i].y = 0;             // Start at the top
-                //     }
-                // }
 
                 updateBom(&bombs[bomIndex].x, &bombs[bomIndex].y);
 
@@ -246,6 +227,8 @@ void main()
                     {
                         updateBom(&bombs[4].x, &bombs[4].y);
                     }
+                } else {
+                    
                 }
 
                 // Check if the bom has reached the bottom of the screen

@@ -114,6 +114,17 @@ void drawRectARGB32(int x1, int y1, int x2, int y2, unsigned int attr, int fill)
     }
 }
 
+void displayImage(const unsigned long* bitmap, int image_width, int image_height, int xOffset, int yOffset) {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            // Check if current position + offset is inside the image bounds
+            if ((x + xOffset) < image_width && (y + yOffset) < image_height) {
+                unsigned int attr = bitmap[(y + yOffset) * image_width + (x + xOffset)];
+                drawPixelARGB32(x, y, attr);
+            }
+        }
+    }
+}
 
 void printFont(unsigned char *fontData, int x, int y, unsigned int color0, unsigned int color1, int pixelSize)
 {
